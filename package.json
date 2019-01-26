@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "multihashes": "^0.4.14",
+    "sha3": "^2.0.0"
+  }
+}
