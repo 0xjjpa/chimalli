@@ -15,6 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 
 import getWeb3 from "./utils/getWeb3";
+import Codex from './utils/codexAPI';
 
 const styles = theme => ({
   appBar: {
@@ -70,64 +71,56 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: localStorage.getItem('users') || [],
+      codex: [],
       web3: null,
-      accounts: null
+      accounts: null,
+      codexStatus: 'unloaded'
     }
-    this.loadUsersFromWeb3 = this.loadUsersFromWeb3.bind(this);
   }
 
   componentDidMount = async () => {
     try {
-      // Get network provider and web3 instance.
+      
       const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
-      console.log('[ ComponentDidMount ] Accounts', accounts);
-      this.setState({ web3, accounts });
+       
+      const codexAPI = new Codex(web3);
+      const codexStatus = await codexAPI.start();
+      const codex = await codexAPI.loadCodex();
+      
+      this.setState({ web3, accounts, codex, codexStatus });
+
     } catch(error) {
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
       console.error(error);
     }
-  }
-
-  loadUsersFromWeb3() {
-    const { accounts } = this.state;
-    const account = { address: accounts[0] }
-    const users = [ account ].concat(localStorage.getItem('users') || []) 
-    this.setState({ users })
-    console.log('[ loadUsersFromWeb3 ] Users', users);
   }
   
   render () {
     const { classes } = this.props;
-    const { users } = this.state;
+    const { codex } = this.state;
 
-    const rendereableUsers = (users) => users.map(user => (
-      <Grid item key={user.address} sm={6} md={4} lg={3}>
+    const renderCodex = (codex) => codex.map((chimalli, index) => (
+      <Grid item key={chimalli} sm={6} md={4} lg={3}>
         <Card className={classes.card}>
           <CardContent className={classes.cardContent}>
             <Typography gutterBottom variant="h6" component="h3">
-              Address
+              🛡 Chimalli #{index + 1}
             </Typography>
-            <Typography>
-              <pre className={classes.cardAddress}>{ user.address }</pre>
-            </Typography>
+            <pre className={classes.cardAddress}>{ chimalli }</pre>
           </CardContent>
           <CardActions>
             <Button size="small" color="primary">
-              View Keys
+              Store
             </Button>
             <Button size="small" color="primary">
-              Encrypt Secret
+              Request
             </Button>
           </CardActions>
         </Card>
       </Grid>
     ))
 
-    const messageUserCard = (message) =>
+    const renderMessage = (message) =>
     <Grid item sm={6} md={4} lg={3}>
       <Card className={classes.card}>
         <CardContent className={classes.cardContent}>
@@ -165,7 +158,7 @@ class App extends React.Component {
               <div className={classes.heroButtons}>
                 <Grid container spacing={16} justify="center">
                   <Grid item>
-                    <Button variant="contained" color="primary" onClick={() => this.loadUsersFromWeb3()}>
+                    <Button variant="contained" color="primary">
                       Connect metamask user
                     </Button>
                   </Grid>
@@ -180,14 +173,11 @@ class App extends React.Component {
           </div>
           <div className={classNames(classes.layout, classes.cardGrid)}>
             {/* End hero unit */}
-            <Grid container spacing={40} justify={ users.length <= 3 ? "center" : "flex-start" }>
+            <Grid container spacing={40} justify={ codex.length <= 3 ? "center" : "flex-start" }>
               {
-                rendereableUsers(users)
-              }
-              {
-                users.length === 0 ?
-                  messageUserCard({ title: 'No accounts connected', content: 'Please pick an account from metamask, and connect via the “Connect Metamask User” button.' }) :
-                  users.length <= 4 && messageUserCard({ title: 'Not enough accounts', content: 'Please have at least 4 accounts in Metamask to use the applcation.' })
+                codex.length === 0 ?
+                  renderMessage({ title: 'Loading codex', content: 'Wait while we load all the chimallis currently stored in the codex.' }) :
+                  renderCodex(codex)
               }
             </Grid>
           </div>

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "multihashes": "^0.4.14",
+    "openzeppelin-test-helpers": "^0.1.2",
     "sha3": "^2.0.0"
   }
 }

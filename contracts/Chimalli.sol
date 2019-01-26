@@ -4,7 +4,7 @@ contract Chimalli {
 
     event LogAddedSecret(address indexed secretOwner, bytes32 ipfsHash, bytes32 secretHash);
 
-    address public owner;
+    address payable public owner;
     mapping (address => Secret) public secrets;
     mapping (bytes32 => uint256) private indicies;
 
@@ -13,15 +13,17 @@ contract Chimalli {
         bytes32 nameHash;
     }
 
-    constructor() public {
-        owner = msg.sender;
+    constructor(address payable _owner) public {
+        owner = _owner;
     }
+
+    modifier isOwner() {require(msg.sender == owner, "Only the secret keeper can destroy the chimalli"); _;}
 
     function store(bytes32 _ipfsHash, bytes32 _nameHash)
     external
     {
         secrets[msg.sender] = (
-            Secret({ 
+            Secret({
             ipfsHash: _ipfsHash,
             nameHash: _nameHash
             })
@@ -36,5 +38,20 @@ contract Chimalli {
     returns (bytes32, bytes32)
     {
         return (secrets[msg.sender].ipfsHash, secrets[msg.sender].nameHash);
+    }
+
+    function keeper() 
+    external
+    view
+    returns (address)
+    {
+        return owner;
+    }
+
+    function kill()
+    public
+    isOwner
+    {
+        selfdestruct(owner);
     }
 }
