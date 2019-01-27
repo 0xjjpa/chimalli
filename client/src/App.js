@@ -110,8 +110,7 @@ class App extends React.Component {
 
   async loadCodex() {
     const { codexAPI } = this.state;
-    const codex = await codexAPI.loadCodex();
-    console.log('Loading Codex', codex)
+    const codex = await codexAPI.loadCodex() || [];
     this.setState({ codex })
   }
 

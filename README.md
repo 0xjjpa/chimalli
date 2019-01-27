@@ -15,9 +15,11 @@ This project relies in [Node 8.x](https://nodejs.org/en/) > and [Npm 6.x](https:
 
 `npm run blockchain`
 
-1. In a separate tab, compile and deploy our sample contracts. This process can be done individually through `truffle`, or you can just run the following command to do both.
+1. In a separate tab, compile and deploy our sample contracts. This process can be done individually through `truffle compile && truffle migrate`, or you can just run the following command to do both.
 
 `npm run build:backend`
+
+If you have any issues, you can always do `npm run build:backend-reset`, which will trigger a `truffle migrate --reset` instead of a normal `truffle migrate`.
 
 1. You should had seen a bunch of commands in your `ganache` console. In another terminal, we’ll run our frontend to start interacting with our application.
 
