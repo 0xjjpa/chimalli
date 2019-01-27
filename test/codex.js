@@ -5,7 +5,7 @@ contract('Codex', accounts => {
     it('...should have no Chimalli deployed', async() => {
         const CodexInstance = await Codex.deployed();
 
-        const codexLength = await CodexInstance.getCodexLength.call();
+        const codexLength = await CodexInstance.getCodexLength.call(accounts[0]);
         assert.equal(codexLength.toString(), 0, 'Codex was deployed with some Chimallis');
     })
 
@@ -16,7 +16,7 @@ contract('Codex', accounts => {
         const chimalli2 = await CodexInstance.createChimalli(accounts[2]);
         const chimalli3 = await CodexInstance.createChimalli(accounts[3]);
 
-        const codexLength = await CodexInstance.getCodexLength.call();
+        const codexLength = await CodexInstance.getCodexLength.call(accounts[0]);
         assert.equal(codexLength.toString(), 3, 'Codex didn‘t create 3 Chimallis');
     })
 })
