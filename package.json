@@ -8,6 +8,7 @@
     "migrate:ropsten": "truffle migrate --network ropsten",
     "start:app": "cd client && npm run start",
     "build:backend": "npm run compile && npm run migrate",
+    "rebuild": "npm run clean && npm run migrate",
     "reset": "truffle migrate --reset",
     "reset:backend": "npm run compile && npm run reset",
     "deploy": "npm run deploy:ropsten && npm run deploy:app",

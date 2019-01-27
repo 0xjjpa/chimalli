@@ -78,6 +78,7 @@ class App extends React.Component {
       codex: [],
       keypair: locksmith.retrieveKeys(),
       generatingKeys: false,
+      account: null,
       web3: null,
       keeper: null,
       threshold: 2,
@@ -98,10 +99,11 @@ class App extends React.Component {
   componentDidMount = async () => {
     try {
       const web3 = await getWeb3();
-      const [ keeper ] = await web3.eth.getAccounts();
+      const [ account ] = await web3.eth.getAccounts();
+      const keeper = account;
       const codexAPI = new Codex(web3);
       await codexAPI.start();
-      this.setState({ web3, keeper, codexAPI });
+      this.setState({ web3, keeper, account, codexAPI });
       await this.loadCodex();
     } catch(error) {
       console.error(error);
@@ -109,8 +111,8 @@ class App extends React.Component {
   }
 
   async loadCodex() {
-    const { codexAPI } = this.state;
-    const codex = await codexAPI.loadCodex() || [];
+    const { codexAPI, account } = this.state;
+    const codex = await codexAPI.loadCodex(account) || [];
     console.log('[ App ] loadCodex | codex', codex);
     this.setState({ codex })
   }

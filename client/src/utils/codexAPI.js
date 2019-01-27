@@ -8,7 +8,7 @@ class Codex {
     this.web3 = web3;
   }
   async start() {
-    console.log('[ Codex ] start | Initializing Codex...');
+    console.log('[ Codex ] start | Initializing Codex');
     try {
       const networkId = await this.web3.eth.net.getId();
       console.log('[ Codex ] start | networkId ', networkId)
@@ -25,20 +25,21 @@ class Codex {
     }
   };
 
-  loadCodex = async () => {
+  loadCodex = async (address) => {
+    console.log('[ Codex ] loadCodex | address - Loading codex for the following address', address)
     const { instance } = this;
-    const codexLength = Number(await instance.methods.getCodexLength().call());
+    const codexLength = Number(await instance.methods.getCodexLength(address).call());
     const codex = await Q.allSettled(range(0,codexLength).map(async (index) =>     
-      await instance.methods.getChimalli(index).call()
+      await instance.methods.getChimalli(address, index).call()
     ))
     return codex.map( wrappedChimalli => wrappedChimalli.value );
   };
 
-  createChimalli = async (address, cb) => {
+  createChimalli = async (keeper, cb) => {
     const { instance, web3 } = this;
     const [ account ] = await web3.eth.getAccounts();
     const price = await web3.eth.getGasPrice()
-    const request = await instance.methods.createChimalli(address)
+    const request = await instance.methods.createChimalli(keeper)
     const estimatedGas = await request.estimateGas({ from: account });
     const transactionDetails = { from: account, gas: estimatedGas, gasPrice: price };
 

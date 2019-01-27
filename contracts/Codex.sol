@@ -47,26 +47,28 @@ contract Codex {
      * @title getCodexLength
      * @notice Our codex getter for seeing how many Chimallis per contract we have.
      * @type function
+     * @param (address) _address = The address of the Chimalli’s secret keeper
      * @return (uint) The amount of Chimallis stored in our Codex per owner.
      */
-    function getCodexLength()
+    function getCodexLength(address _address)
     public
     view
     returns (uint) {
-        return codex[msg.sender].length;
+        return codex[_address].length;
     }
 
     /*
      * @title getChimalli
      * @notice Our codex getter for seeing the address of a specific chimalli.
      * @type function
+     * @param (address) _address = The address of the Chimalli’s secret keeper
      * @param (uint) _index = The index of the Chimalli’s contract we want to obtain per sender.
      * @return (Chimalli) The address of the sender’s Chimalli’s contract within our Codex.
      */
-    function getChimalli(uint _index)
+    function getChimalli(address _address, uint _index)
     public
     view
     returns (Chimalli) {
-        return codex[msg.sender][_index];
+        return codex[_address][_index];
     }
 }
