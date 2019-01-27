@@ -1,7 +1,7 @@
 {
   "name": "chimalli",
   "scripts": {
-    "blockchain": "ganache-cli --port 7545 --mnemonic \"own install ladder notice repair mother wing shine allow mimic lazy bike\"",
+    "blockchain": "ganache-cli --port 8545 --mnemonic \"own install ladder notice repair mother wing shine allow mimic lazy bike\"",
     "clean": "rm -rf client/src/contracts",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
