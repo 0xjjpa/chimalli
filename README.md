@@ -68,6 +68,16 @@ Afterwards, change the setting to connect to `Custom RPC` and in `Settings`, und
 
 ## Tests
 
+Our tests cover the following scenarios:
+
+1. As a user, I can create chimallis and perform read and write operations against them.
+1. As a user, I can create codex, and manage chimallis through it in order to perform operations against them.
+1. As a user, I can store encrypted secrets into a chimalli.
+1. As a user, I can request from the owner of the chimalli my encrypted secret.
+1. As the codex owner, I can destroy or stop a chimalli from working if something goes wrong.
+
+In short, we want to cover the most common scenarios locally, ensuring that we can make the application work both locally from a test perspective, as well as through Metamask, using mocked responses and previously generated keys.
+
 1. To run the tests, make sure to first have ran `npm run blockchain` in a separate tab. Afterwards, you can run our tests with the following command.
 
 `npm run test`.
