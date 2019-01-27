@@ -16,7 +16,7 @@ class Codex {
         CodexContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
-      this.contract = instance;
+      this.instance = instance;
       return 'loaded';
     } catch (error) {
       console.error(error);
@@ -24,12 +24,31 @@ class Codex {
   };
 
   loadCodex = async () => {
-    const { contract } = this;
-    const codexLength = Number(await contract.methods.getCodexLength().call());
+    const { instance } = this;
+    const codexLength = Number(await instance.methods.getCodexLength().call());
     const codex = await Q.allSettled(range(0,codexLength).map(async (index) =>     
-      await contract.methods.getChimalli(index).call()
+      await instance.methods.getChimalli(index).call()
     ))
     return codex.map( wrappedChimalli => wrappedChimalli.value );
+  };
+
+  createChimalli = async (address) => {
+    const { instance, web3 } = this;
+    const [ account ] = await web3.eth.getAccounts();
+    const price = await web3.eth.getGasPrice()
+    const request = await instance.methods.createChimalli(address)
+    const estimatedGas = await request.estimateGas({ from: account });
+    const transactionDetails = { from: account, gas: estimatedGas, gasPrice: price };
+
+    const receipt = await request.send(transactionDetails)
+      .on('transactionHash', transactionHash => {
+        alert(`Success, your transaction hash is ${transactionHash}. Please monitor the status of the transaction.`)
+      })
+      .on('error', error => {
+        alert(`There was an error creating your Chimalli: ${error}`)
+      })
+
+    return receipt;
   };
 };
 

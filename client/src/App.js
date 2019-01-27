@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button';
 import SecurityIcon from '@material-ui/icons/Security';
 import TextField from '@material-ui/core/TextField';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
@@ -17,6 +16,8 @@ import { withStyles } from '@material-ui/core/styles';
 import getWeb3 from "./utils/getWeb3";
 import Codex from './utils/codexAPI';
 import locksmith from './utils/locksmith';
+
+import ChimalliCard from './components/ChimalliCard';
 
 const secrets = require('secrets.js');
 
@@ -78,29 +79,32 @@ class App extends React.Component {
       keypair: locksmith.retrieveKeys(),
       generatingKeys: false,
       web3: null,
-      accounts: null,
+      keeper: null,
       threshold: 2,
       amountOfPieces: 3,
       secret: 'I know where the aztec gold is.',
       pieces: [],
-      codexStatus: 'unloaded'
+      codexAPI: null,
+      chimalliAPI: null
     }
     this.hasKeypair = this.hasKeypair.bind(this);
     this.showPublicKey = this.showPublicKey.bind(this);
     this.splitSecret = this.splitSecret.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.createChimalli = this.createChimalli.bind(this);
   }
 
   componentDidMount = async () => {
     try {
       
       const web3 = await getWeb3();
-      const accounts = await web3.eth.getAccounts();
+      const [ keeper ] = await web3.eth.getAccounts();
        
       const codexAPI = new Codex(web3);
-      const codexStatus = await codexAPI.start();
+      await codexAPI.start();
       const codex = await codexAPI.loadCodex();
       
-      this.setState({ web3, accounts, codex, codexStatus });
+      this.setState({ web3, keeper, codex, codexAPI });
 
     } catch(error) {
       console.error(error);
@@ -136,35 +140,24 @@ class App extends React.Component {
     alert(JSON.stringify(pieces));
   }
 
+  handleChange = name => event => {
+    this.setState({
+      [name]: event.target.value,
+    });
+  };
+
+  createChimalli = async () => {
+    const { codexAPI, keeper } = this.state;
+    const transactionReceipt = await codexAPI.createChimalli(keeper);
+    console.log('Transaction Receipt', transactionReceipt);
+    const codex = transactionReceipt && await codexAPI.loadCodex();
+    this.setState({ codex });
+  }
+
+
   render () {
     const { classes } = this.props;
-    const { codex, generatingKeys, threshold, pieces, amountOfPieces, secret } = this.state;
-
-    const renderCodex = (codex) => codex.map((chimalli, index) => (
-      <Grid item key={chimalli} sm={6} md={4} lg={3}>
-        <Card className={classes.card}>
-          <CardContent className={classes.cardContent}>
-            <Typography gutterBottom variant="h6" component="h3">
-              🛡 Chimalli #{index + 1}
-            </Typography>
-            <Typography>
-              Currently hold no secret pieces from you. Pick “Store” to make me hold an encrypted piece.
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button size="small" color="primary" onClick={() => alert(chimalli)}>
-              Address
-            </Button>
-            <Button size="small" color="primary">
-              Store
-            </Button>
-            <Button size="small" color="primary">
-              Request
-            </Button>
-          </CardActions>
-        </Card>
-      </Grid>
-    ))
+    const { web3, codex, generatingKeys, threshold, pieces, amountOfPieces, secret, keeper } = this.state;
 
     const renderMessage = (message) =>
     <Grid item sm={6} md={4} lg={3}>
@@ -206,9 +199,10 @@ class App extends React.Component {
                 Secret Sharing
               </Typography>
               <Typography align="center" color="textPrimary" paragraph>
-                Chimalli uses <a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing" target="_blank">Shamir's Secret Sharing (SSS)</a>
-                &nbsp; algorithm to safely split a known secret into <b>unreveleaing pieces</b>, that put together return the original one. SSS works 
-                by providing a <b>threshold</b> of required pieces and the total of pieces that the secret will be split of.
+                Chimalli uses <a rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing" target="_blank">Shamir's Secret Sharing (SSS)</a>
+                &nbsp; algorithm to safely split a known secret into <b>unreveleaing pieces</b>, that when put together return the content of 
+                the original secret. SSS works by providing a <b>threshold</b> of required pieces and the total of pieces that the secret will
+                be split of.
               </Typography>
               <Grid container spacing={16} justify="center" style={{ marginBottom: '48px' }}>
                   <Grid item style={{ display: 'flex', alignItems: 'baseline' }}>
@@ -220,6 +214,7 @@ class App extends React.Component {
                       margin="normal"
                       type="number"
                       value={threshold}
+                      onChange={this.handleChange('threshold')}
                     />
                     parts out
                     <TextField
@@ -229,6 +224,7 @@ class App extends React.Component {
                       margin="normal"
                       type="number"
                       value={amountOfPieces}
+                      onChange={this.handleChange('pieces')}
                     />
                     to reconstruct the secret.
                   </Grid>
@@ -240,6 +236,7 @@ class App extends React.Component {
                       margin="normal"
                       multiline
                       value={secret}
+                      onChange={this.handleChange('secret')}
                     />
                   </Grid>
                   <Grid item>
@@ -260,7 +257,7 @@ class App extends React.Component {
                 Public Key Cryptography
               </Typography>
               <Typography align="center" color="textPrimary" paragraph>
-                Since we want to store our pieces safely, Chimalli uses <a href="https://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">public-key</a>
+                Since we want to store our pieces safely, Chimalli uses <a rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">public-key</a>
                 &nbsp;cryptography to first encrypt each of these pieces. We'll then store these
                  encrypted pieces in Ethereum contracts ("Chimallis") and manage them through a master
                  contract registry ("Codex"). To do so, we first need a PGP Keypair that we can use
@@ -297,7 +294,7 @@ class App extends React.Component {
                 <Grid item>
                   <Typography align="center" color="textSecondary" paragraph>
                     Generating a RSA-4096 PGP Keypair can be CPU consuming. We are using Keybase&nbsp;
-                    <a target='_blank' href='https://github.com/keybase/kbpgp'>kbpgp</a> implementation.
+                    <a target='_blank' rel="noopener noreferrer" href='https://github.com/keybase/kbpgp'>kbpgp</a> implementation.
                     Please allow 1-2 minutes while we generate the keys. In the meantime, you can read
                     what Chimalli is about and how it works as an application.
                   </Typography>
@@ -307,21 +304,43 @@ class App extends React.Component {
           </div>
           <div className={classNames(classes.layout, classes.cardGrid)}>
             {/* End hero unit */}
-            <div style={{ marginBottom: '48px' }}>
+            <div style={{ marginBottom: '48px', textAlign: 'center' }}>
             <Typography component="h3" variant="h4" align="center" color="textPrimary" gutterBottom>
               Distributed Codex
             </Typography>
             <Typography align="center" color="textPrimary" paragraph>
               Our Codex is a Smart Contract on top of the Ethereum Network that helps us manage small Chimalli instances. Each instance
               can store an encrypted secret from our side in the form of an IPFS Hash. Each Chimalli is tied to a specific "Keeper", a
-              known friend we can request the encrypted secret from.
+              known friend we can request the encrypted secret from. To create a chimalli, you need to provide an address that will be
+              the "Keeper" of that secret. The "Keeper" will require to authorize requests from you to give your encrypted secret piece back.
             </Typography>
+            <br/>
+            <TextField
+              style={{ margin: '0 5px', width: '100%', textAlign: 'center' }}
+              id="keeper"
+              label="keeper"
+              helperText="This is your current Metamask account, but you can use any address."
+              margin="normal"
+              multiline
+              value={keeper || 'Loading...'}
+              onChange={this.handleChange('keeper')}
+            />
+            <br/>
+            <Button style={{ marginBottom: '12px' }} variant="contained" color="primary" onClick={() => this.createChimalli()}>
+              Create chimalli
+            </Button>
+            <br/>
+            <Typography align="center" color="textSecondary" paragraph style={{width: "50%", margin: "auto"}}>
+              For simplicity purposes of this example, we are defaulting to your Metamask account to be the Keeper of your chimallis, as
+              you will be required to authorize requests against it. However, you can pick any address you want.
+            </Typography>
+            <br/>
             </div>
             <Grid container spacing={40} justify={ codex.length <= 3  ? "center" : "flex-start" }>
               {
                 codex.length === 0 ?
-                  renderMessage({ title: 'Loading codex', content: 'Wait while we load all the chimallis currently stored in the codex.' }) :
-                  renderCodex(codex)
+                  renderMessage({ title: 'Empty codex', content: 'Your codex currently has no Chimallis. Click “Create chimalli” to create one through our Smart Contract' }) :
+                  codex.map( (address, index) => <ChimalliCard key={address} web3={web3} address={address} classes={classes} index={index} /> )
               }
             </Grid>
           </div>
