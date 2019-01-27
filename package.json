@@ -1,7 +1,20 @@
 {
+  "name": "chimalli",
+  "scripts": {
+    "blockchain": "ganache-cli --port 7545 --mnemonic \"own install ladder notice repair mother wing shine allow mimic lazy bike\"",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "migrate:reset": "truffle migrate --reset ",
+    "start:app": "cd client && npm run start",
+    "build:backend": "npm run compile && npm run migrate",
+    "test": "truffle test",
+    "setup": "npm install && cd client && npm install"
+  },
   "dependencies": {
+    "ganache-cli": "^6.2.5",
     "multihashes": "^0.4.14",
     "openzeppelin-test-helpers": "^0.1.2",
-    "sha3": "^2.0.0"
+    "sha3": "^2.0.0",
+    "truffle": "^5.0.2"
   }
 }
