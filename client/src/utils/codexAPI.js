@@ -11,7 +11,9 @@ class Codex {
     console.log('[ Codex ] start | Initializing Codex...');
     try {
       const networkId = await this.web3.eth.net.getId();
+      console.log('[ Codex ] start | networkId ', networkId)
       const deployedNetwork = CodexContract.networks[networkId];
+      console.log('[ Codex ] start | deployedNetwork ', deployedNetwork)
       const instance = new this.web3.eth.Contract(
         CodexContract.abi,
         deployedNetwork && deployedNetwork.address,

@@ -5,18 +5,23 @@
     "clean": "rm -rf client/src/contracts",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "migrate:reset": "truffle migrate --reset ",
+    "migrate:ropsten": "truffle migrate --network ropsten",
     "start:app": "cd client && npm run start",
     "build:backend": "npm run compile && npm run migrate",
-    "build:backend-reset": "npm run compile && npm run migrate:reset",
+    "reset": "truffle migrate --reset",
+    "reset:backend": "npm run compile && npm run reset",
+    "deploy:app": "cd client && npm run build && npm run deploy",
+    "deploy:ropsten": "npm run clean && npm run compile && npm run migrate:ropsten",
     "test": "truffle test",
     "setup": "npm install && cd client && npm install"
   },
   "dependencies": {
+    "dotenv": "^6.2.0",
     "ganache-cli": "^6.2.5",
     "multihashes": "^0.4.14",
     "openzeppelin-test-helpers": "^0.1.2",
     "sha3": "^2.0.0",
-    "truffle": "^5.0.2"
+    "truffle": "^5.0.2",
+    "truffle-hdwallet-provider": "^1.0.2"
   }
 }

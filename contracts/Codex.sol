@@ -39,8 +39,8 @@ contract Codex {
     external
     {
         Chimalli chimalli = new Chimalli(_address);
-        emit LogChimalliCreated(chimalli, _address);
         codex[msg.sender].push(chimalli);
+        emit LogChimalliCreated(chimalli, _address);
     }
 
     /*

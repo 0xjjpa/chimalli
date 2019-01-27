@@ -1,0 +1,11 @@
+{
+    "version": 2,
+    "name": "chimalli",
+    "alias": "chimalli",
+    "builds": [
+        {
+            "src": "**/*",
+            "use": "@now/static"
+        }
+    ]
+}

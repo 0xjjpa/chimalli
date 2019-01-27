@@ -33,7 +33,7 @@ or stop them from retrieving secrets if we feel one of our Keepers had been comp
 
 ## Requirements
 
-This project relies in [Node 8.x](https://nodejs.org/en/) > and [Npm 6.x](https://www.npmjs.com/) in the backend, and [Metamask] to interact with the actual application. Make sure to have those within your system or install an environment through [Vagrant](https://www.vagrantup.com/) or [Docker](https://www.docker.com/) that contains this software. Alternatively, you can use [nvm](https://github.com/creationix/nvm) to install node.js in your environment.
+This project relies in [Node 8.x](https://nodejs.org/en/) > and [Npm 6.x](https://www.npmjs.com/) to be run in a Unix-like environment, as well as a browser with [Metamask] installed to interact with the actual application. Make sure to have those within your system or install an environment through [Vagrant](https://www.vagrantup.com/) or [Docker](https://www.docker.com/) that contains this software. Alternatively, you can use [nvm](https://github.com/creationix/nvm) to install node.js in your environment.
 
 ## Local setup
 
