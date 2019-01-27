@@ -92,6 +92,7 @@ class App extends React.Component {
     this.splitSecret = this.splitSecret.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.createChimalli = this.createChimalli.bind(this);
+    this.loadCodex = this.loadCodex.bind(this);
   }
 
   componentDidMount = async () => {
@@ -102,13 +103,18 @@ class App extends React.Component {
        
       const codexAPI = new Codex(web3);
       await codexAPI.start();
-      const codex = await codexAPI.loadCodex();
-      
-      this.setState({ web3, keeper, codex, codexAPI });
-
+      this.setState({ web3, keeper, codexAPI });
+      await this.loadCodex();
     } catch(error) {
       console.error(error);
     }
+  }
+
+  async loadCodex() {
+    const { codexAPI } = this.state;
+    const codex = await codexAPI.loadCodex();
+    console.log('Loading Codex', codex)
+    this.setState({ codex })
   }
 
   showPublicKey() {
@@ -147,11 +153,10 @@ class App extends React.Component {
   };
 
   createChimalli = async () => {
-    const { codexAPI, keeper } = this.state;
-    const transactionReceipt = await codexAPI.createChimalli(keeper);
-    console.log('Transaction Receipt', transactionReceipt);
-    const codex = transactionReceipt && await codexAPI.loadCodex();
-    this.setState({ codex });
+    const { codexAPI, keeper, codex } = this.state;
+    const transactionReceipt = await codexAPI.createChimalli(keeper, alert);
+    // We’ll give it a bit of time for the status to reflect before loading it
+    transactionReceipt && setTimeout(this.loadCodex, 2000);
   }
 
 
@@ -295,8 +300,8 @@ class App extends React.Component {
                   <Typography align="center" color="textSecondary" paragraph>
                     Generating a RSA-4096 PGP Keypair can be CPU consuming. We are using Keybase&nbsp;
                     <a target='_blank' rel="noopener noreferrer" href='https://github.com/keybase/kbpgp'>kbpgp</a> implementation.
-                    Please allow 1-2 minutes while we generate the keys. In the meantime, you can read
-                    what Chimalli is about and how it works as an application.
+                    Please allow 1-2 minutes while we generate the keys. In the meantime, you can continue with
+                    the next required steps, as this won’t interrupt the key generation process.
                   </Typography>
                 </Grid>
               </Grid>
@@ -309,7 +314,7 @@ class App extends React.Component {
               Distributed Codex
             </Typography>
             <Typography align="center" color="textPrimary" paragraph>
-              Our Codex is a Smart Contract on top of the Ethereum Network that helps us manage small Chimalli instances. Each instance
+              Our Codex is a Smart Contract on top of the Ethereum Network that helps us manage small Chimalli instances. Each Chimalli
               can store an encrypted secret from our side in the form of an IPFS Hash. Each Chimalli is tied to a specific "Keeper", a
               known friend we can request the encrypted secret from. To create a chimalli, you need to provide an address that will be
               the "Keeper" of that secret. The "Keeper" will require to authorize requests from you to give your encrypted secret piece back.
@@ -326,13 +331,27 @@ class App extends React.Component {
               onChange={this.handleChange('keeper')}
             />
             <br/>
-            <Button style={{ marginBottom: '12px' }} variant="contained" color="primary" onClick={() => this.createChimalli()}>
-              Create chimalli
-            </Button>
+            <Grid container spacing={16} justify="center">
+              <Grid item>
+                <Button style={{ marginBottom: '12px' }} variant="contained" color="primary" onClick={() => this.createChimalli()}>
+                  Create chimalli
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button variant="outlined" color="primary" onClick={() => this.loadCodex()}>
+                  Reload codex
+                </Button>
+              </Grid>
+            </Grid>            
             <br/>
             <Typography align="center" color="textSecondary" paragraph style={{width: "50%", margin: "auto"}}>
               For simplicity purposes of this example, we are defaulting to your Metamask account to be the Keeper of your chimallis, as
               you will be required to authorize requests against it. However, you can pick any address you want.
+            </Typography>
+            <br/>
+            <Typography align="center" color="textSecondary" paragraph style={{width: "50%", margin: "auto"}}>
+               If your new Chimalli does not appear after a couple seconds on a successful message, please reload the Codex. Sometimes it
+               takes a bit of extra time while the Codex smart contract updates its storage.
             </Typography>
             <br/>
             </div>

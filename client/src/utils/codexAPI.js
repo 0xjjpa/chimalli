@@ -32,7 +32,7 @@ class Codex {
     return codex.map( wrappedChimalli => wrappedChimalli.value );
   };
 
-  createChimalli = async (address) => {
+  createChimalli = async (address, cb) => {
     const { instance, web3 } = this;
     const [ account ] = await web3.eth.getAccounts();
     const price = await web3.eth.getGasPrice()
@@ -42,10 +42,10 @@ class Codex {
 
     const receipt = await request.send(transactionDetails)
       .on('transactionHash', transactionHash => {
-        alert(`Success, your transaction hash is ${transactionHash}. Please monitor the status of the transaction.`)
+        cb(`Success, your transaction hash is ${transactionHash}. Please monitor the status of the transaction.`)
       })
       .on('error', error => {
-        alert(`There was an error creating your Chimalli: ${error}`)
+        cb(`There was an error creating your Chimalli: ${error}`)
       })
 
     return receipt;
