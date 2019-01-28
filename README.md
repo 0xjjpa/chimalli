@@ -1,5 +1,5 @@
 # 🛡 Chimalli
-An experiment for showcasing how decentralised backups can be made using PGP encryption and Shamir's Secret Sharing algorithm on top of the Ethereum network.
+https://chimalli.now.sh - An experiment for showcasing how decentralised backups can be made using PGP encryption and Shamir's Secret Sharing algorithm on top of the Ethereum network.
 
 ## Goal
 
@@ -84,18 +84,18 @@ In short, we want to cover the most common scenarios locally, ensuring that we c
 
 ## Roadmap
 
-[ ] Actually encrypt the pieces using the PGP generated keys.
-[ ] Actually store the pieces in IPFS instead of localstorage by solving issues with multihash when parsing back the hash in bytes32 format.
-[ ] Storage to Chimallis’ isn't working due to delegate misuses from the Codex registry. Update the tests to reflect this.
-[ ] Enable circuit breaker on chimallis by disabling keepers in the Codex contract.
-[ ] Allow upgrading Chimallis by offlining them and creating new ones through the Codex through a temporal proxy contract.
-[ ] Auto-generate the documentation and finish missing methods with documentation.
-[ ] Increase test coverage and split tests in the defined user stories.
-[ ] Add diagram to `design_patterns_decisions.md`
-[ ] Document deploy steps for bakend / frontend (i.e. explain what `npm run deploy` does)
-[ ] Clean up front-end code to be less of an eye sore.
-[ ] Review Seriality to parse all secrets from an array within the Chimalli contract.
-[ ] Iterate properly over all Chimallis owner per codex instead of always assuming the first one.
+- [ ] Actually encrypt the pieces using the PGP generated keys.
+- [ ] Actually store the pieces in IPFS instead of localstorage by solving issues with multihash when parsing back the hash in bytes32 format.
+- [ ] Storage to Chimallis’ isn't working due to delegate misuses from the Codex registry. Update the tests to reflect this.
+- [ ] Enable circuit breaker on chimallis by disabling keepers in the Codex contract.
+- [ ] Allow upgrading Chimallis by offlining them and creating new ones through the Codex through a temporal proxy contract.
+- [ ] Auto-generate the documentation and finish missing methods with documentation.
+- [ ] Increase test coverage and split tests in the defined user stories.
+- [ ] Add diagram to `design_patterns_decisions.md`
+- [ ] Document deploy steps for bakend / frontend (i.e. explain what `npm run deploy` does)
+- [ ] Clean up front-end code to be less of an eye sore.
+- [ ] Review Seriality to parse all secrets from an array within the Chimalli contract.
+- [ ] Iterate properly over all Chimallis owner per codex instead of always assuming the first one.
 
 ## Inspiration
 
