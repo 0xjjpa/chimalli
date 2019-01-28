@@ -8,6 +8,8 @@ import Button from '@material-ui/core/Button';
 import Chimalli from '../utils/chimalliAPI';
 import { WrappedDialog } from './Dialog';
 
+const EMPTY_PIECE = '0x0000000000000000000000000000000000000000000000000000000000000000';
+
 export default class ChimalliCard extends React.Component {
   constructor(props) {
     super(props)
@@ -15,9 +17,18 @@ export default class ChimalliCard extends React.Component {
     this.state = {
       open: false,
       selectedValue: '',
+      secret: '',
+      piece: EMPTY_PIECE
     };
     this.API = new Chimalli(web3, address);
     this.getKeeper = this.getKeeper.bind(this);
+    this.loadSecrets = this.loadSecrets.bind(this);
+  }
+
+
+  async componentDidMount() {
+    const { API } = this;
+    await this.loadSecrets();   
   }
 
   storePiece = () => {
@@ -26,9 +37,25 @@ export default class ChimalliCard extends React.Component {
     });
   };
 
-  handleClose = value => {
-    console.log('Selected Value', value);
-    this.setState({ selectedValue: value, open: false });
+  async loadSecrets() {
+    const { API } = this;
+    const unparsedSecret = await API.getSecret();
+    const [ secret, namehash ] = Object.keys(unparsedSecret).map( key => unparsedSecret[key]);
+    const piece = API.getPieceFromIPFS(secret)
+    console.log('[ ChimalliCard ] loadSecrets | secret', secret);
+    console.log('[ ChimalliCard ] loadSecrets | piece', piece);
+    this.setState({ secret, piece })
+  }
+
+  handleClose = async (piece) => {
+    if (piece === "" || piece === EMPTY_PIECE ) return this.setState({ open: false });
+    const { API } = this;
+    const { secret } = this.props;
+    this.setState({ open: false });
+    console.log('[ ChimalliCard ] handleClose | piece', piece);
+    const transactionReceipt = await API.storeSecret(secret, piece, alert);
+    // We’ll give it a bit of time for the status to reflect before loading it
+    transactionReceipt && setTimeout(this.loadSecrets, 2000);
   };
 
   async getKeeper() {
@@ -40,6 +67,7 @@ export default class ChimalliCard extends React.Component {
   }
   render() {
     const { address, classes, index } = this.props;
+    const { secret } = this.state;
     return (
       <Grid item key={address} sm={6} md={4} lg={3}>
         <Card className={classes.card}>
@@ -47,9 +75,16 @@ export default class ChimalliCard extends React.Component {
             <Typography gutterBottom variant="h6" component="h3">
               🛡 Chimalli #{index + 1}
             </Typography>
-            <Typography>
-              Currently hold no secret pieces from you. Pick “Store” to make me hold an encrypted piece.
-            </Typography>
+              { 
+                secret !== EMPTY_PIECE ?
+                <Typography>
+                  Currently holding { secret } for you.
+                </Typography>
+                : 
+                <Typography>
+                  Currently hold no secret pieces from you. Pick “Store” to make me hold an encrypted piece.
+                </Typography>
+              }
           </CardContent>
           <CardActions>
             <Button size="small" color="primary" onClick={() => this.getKeeper()}>
@@ -58,8 +93,8 @@ export default class ChimalliCard extends React.Component {
             <Button size="small" color="primary" onClick={() => this.storePiece()}>
               Store
             </Button>
-            <Button size="small" color="primary">
-              Request
+            <Button size="small" color="primary" onClick={() => this.loadSecrets()}>
+              Reload
             </Button>
           </CardActions>
         </Card>

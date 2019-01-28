@@ -27,6 +27,11 @@ function Hash() {
         const bytes32_nameHash = '0x' + hash.digest('hex');
         return bytes32_nameHash;
     }
+    self.parseBytes32IntoHash = function(bytes32_ipfsHash) {
+        const hashFunction = ('sha2-256').substr(2)
+        const digest = bytes32_ipfsHash.substr(2)
+        return multihashes.toB58String(multihashes.fromHexString(hashFunction + digest));
+    }
     return self;
 }
 

@@ -3,7 +3,7 @@ const Codex = artifacts.require('./Codex.sol');
 const Q = require('q');
 const secretMock = require('../mocks/secrets');
 const hashUtility = require('../client/src/utils/hash');
-const IPFS = require('../utils/ipfs');
+const IPFS = require('../client/src/utils/ipfs');
 
 contract('Codex - Basic', accounts => {
     it('...should have no Chimalli deployed', async() => {
@@ -41,7 +41,6 @@ contract('Codex - Storage', accounts => {
         const responseStorage = await CodexInstance.storeSecretPiece.call(index, bytes32_random1, bytes32_random2);
         console.log('Resposnse Storage', responseStorage);
         const storedSecret = await CodexInstance.retrievePiece.call(index);
-
         console.log('Stored Secret', storedSecret);
 
     });

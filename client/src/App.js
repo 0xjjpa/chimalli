@@ -81,10 +81,10 @@ class App extends React.Component {
       account: null,
       web3: null,
       keeper: null,
-      threshold: 2,
-      amountOfPieces: 3,
+      threshold: localStorage.getItem('threshold') || 2,
+      amountOfPieces: localStorage.getItem('amountOfPieces') || 3,
       secret: 'I know where the aztec gold is.',
-      pieces: [],
+      pieces: JSON.parse(localStorage.getItem('pieces')) || [],
       codexAPI: null,
       chimalliAPI: null
     }
@@ -139,6 +139,9 @@ class App extends React.Component {
     const hexSecret = secrets.str2hex(secret);
     const pieces = secrets.share(hexSecret, amountOfPieces, threshold);
     this.setState({ pieces });
+    localStorage.setItem('threshold', threshold);
+    localStorage.setItem('amountOfPieces', amountOfPieces);
+    localStorage.setItem('pieces', JSON.stringify(pieces));
   }
 
   showPieces() {
@@ -359,7 +362,15 @@ class App extends React.Component {
               {
                 codex.length === 0 ?
                   renderMessage({ title: 'Empty codex', content: 'Your codex currently has no Chimallis. Click “Create chimalli” to create one through our Smart Contract' }) :
-                  codex.map( (address, index) => <ChimalliCard pieces={pieces} key={address} web3={web3} address={address} classes={classes} index={index} /> )
+                  codex.map( (address, index) => <ChimalliCard 
+                    pieces={pieces} 
+                    key={address} 
+                    web3={web3} 
+                    address={address} 
+                    classes={classes} 
+                    index={index} 
+                    secret={secret}
+                  /> )
               }
             </Grid>
           </div>
