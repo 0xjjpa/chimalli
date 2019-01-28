@@ -359,7 +359,7 @@ class App extends React.Component {
               {
                 codex.length === 0 ?
                   renderMessage({ title: 'Empty codex', content: 'Your codex currently has no Chimallis. Click “Create chimalli” to create one through our Smart Contract' }) :
-                  codex.map( (address, index) => <ChimalliCard key={address} web3={web3} address={address} classes={classes} index={index} /> )
+                  codex.map( (address, index) => <ChimalliCard pieces={pieces} key={address} web3={web3} address={address} classes={classes} index={index} /> )
               }
             </Grid>
           </div>

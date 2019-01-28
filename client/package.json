@@ -5,7 +5,9 @@
   "dependencies": {
     "@material-ui/core": "^3.9.0",
     "@material-ui/icons": "^3.0.2",
+    "crypto": "^1.0.1",
     "keybase-generator": "^2.0.0",
+    "multihashes": "^0.4.14",
     "now": "^13.1.2",
     "q": "^1.5.1",
     "ramda": "^0.26.1",
@@ -13,6 +15,7 @@
     "react-dom": "^16.6.3",
     "react-scripts": "2.1.1",
     "secrets.js": "^0.1.8",
+    "sha3": "^2.0.0",
     "web3": "^1.0.0-beta.37"
   },
   "scripts": {

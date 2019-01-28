@@ -8,6 +8,8 @@ import "./Chimalli.sol";
  * @author Jose Aguinaga (@jjperezaguinaga) <me@jjperezaguinaga.com>
  */
 contract Codex {
+    enum Status { NOT_ADDED, ADDED }
+    Status status;
     address public owner;
     mapping (address => Chimalli[]) public codex;
 
@@ -19,6 +21,7 @@ contract Codex {
      * @param (address) _address    = The address of the owner of the newly created chimalli
      */
     event LogChimalliCreated(Chimalli _chimalli, address _address);
+    event LogSecretStored(address _address, uint _index, bytes32 _nameHash, bytes32 _ipfsHash);
 
     /*
      * @title constructor
@@ -44,17 +47,65 @@ contract Codex {
     }
 
     /*
-     * @title getCodexLength
-     * @notice Our codex getter for seeing how many Chimallis per contract we have.
+     * @title storeSecretPiece
+     * @notice Our storage method for inserting data into chimallis
      * @type function
-     * @param (address) _address = The address of the Chimalli’s secret keeper
-     * @return (uint) The amount of Chimallis stored in our Codex per owner.
+     * @param (uint) _index         = The index of the Chimalli we'll use from the keeper
+     * @param (bytes32) _nameHash   = The hash of the name of the secret we are storing
+     * @param (bytes32) _ipfsHash   = The ipfs hash with the location of the secret
+     */
+    function storeSecretPiece(uint _index, bytes32 _nameHash, bytes32 _ipfsHash)
+    external
+    returns(bytes32, bytes32)
+    {
+        Chimalli chimalli = codex[msg.sender][_index];
+        chimalli.store(_nameHash, _ipfsHash);
+        emit LogSecretStored(msg.sender, _index, _nameHash, _ipfsHash);
+        return codex[msg.sender][_index].retrieve();
+    }
+
+    function retrievePiece(uint _index)
+    view
+    external
+    returns (bytes32, bytes32)
+    {
+        return codex[msg.sender][_index].retrieve();
+    }
+
+    /*
+     * @title getCodexLength
+     * @notice Our codex getter for seeing how many Chimallis per keeper we have.
+     * @type function
+     * @param (address) _address = The address of the secret keeper we want to know how many chimallis has
+     * @return (uint) The amount of Chimallis stored in our Codex per keeper.
      */
     function getCodexLength(address _address)
     public
     view
     returns (uint) {
         return codex[_address].length;
+    }
+
+    /*
+     * @title getPiecesLength
+     * @notice Our pieces getter for seeing how many pieces we have per secret
+     * @type function
+     * @param (bytes32) _nameHash = The hash of the secret we are storing in our codex.
+     * @return (uint) The amount of Chimallis stored in our Codex per keeper.
+     */
+    function getPiecesLength(address _address)
+    public
+    view
+    returns (uint) {
+        uint chimallisLength = codex[msg.sender].length;
+        return chimallisLength;
+        uint piecesCounter = 0;
+        for (uint i = 0; i < chimallisLength; i++) {
+            if (codex[msg.sender][i].hasSecret()) {
+                piecesCounter++;
+            }
+        }
+        return piecesCounter;
     }
 
     /*

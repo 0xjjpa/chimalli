@@ -49,14 +49,19 @@ contract Chimalli {
     function store(bytes32 _ipfsHash, bytes32 _nameHash)
     external
     {
-        secrets[msg.sender] = (
-            Secret({
-            ipfsHash: _ipfsHash,
-            nameHash: _nameHash
-            })
-        );
-        
+        Secret storage secret = secrets[msg.sender];
+        secret.ipfsHash = _ipfsHash;
+        secret.nameHash = _nameHash;
         emit LogAddedSecret(msg.sender, _ipfsHash, _nameHash);
+    }
+
+    function hasSecret()
+    external
+    view
+    returns (bool)
+    {
+        Secret memory _secret = secrets[msg.sender];
+        return _secret.ipfsHash != 0 && _secret.nameHash != 0;
     }
 
     /*

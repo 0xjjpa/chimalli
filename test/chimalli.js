@@ -1,6 +1,6 @@
 const { shouldFail } = require('openzeppelin-test-helpers');
 const Chimalli = artifacts.require('./Chimalli.sol');
-const hashUtility = require('../utils/hash');
+const hashUtility = require('../client/src/utils/hash');
 
 contract('Chimalli', accounts => {
   it('...should be deployed with a specific owner', async() => {
@@ -18,13 +18,14 @@ contract('Chimalli', accounts => {
     const bytes32_ipfsHash = hashUtility.generateRandomIPFSHashBytes32();
     const bytes32_nameHash = hashUtility.hashNameIntoKeccak256Bytes32('My Gmail Password');
 
+    assert.equal(await ChimalliInstance.hasSecret(), false, 'We shouldn’t have secret yet');
     await ChimalliInstance.store(bytes32_ipfsHash, bytes32_nameHash, { from: accounts[0] });
+    assert.equal(await ChimalliInstance.hasSecret(), true, 'We dont have a secret stored');
 
     // Get stored secret
     const secret = await ChimalliInstance.retrieve.call();
     const [ contract_ipfsHash, contract_nameHash ] = Object.keys(secret).map( index => secret[index] )
     
-
     assert.equal(contract_ipfsHash, bytes32_ipfsHash, 'The IPFS Hash isn’t valid');
     assert.equal(contract_nameHash, bytes32_nameHash, 'The Name Hash isn’t valid');
   });

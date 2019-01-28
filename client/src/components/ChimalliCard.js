@@ -6,14 +6,30 @@ import CardActions from '@material-ui/core/CardActions';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Chimalli from '../utils/chimalliAPI';
+import { WrappedDialog } from './Dialog';
 
 export default class ChimalliCard extends React.Component {
   constructor(props) {
     super(props)
     const { web3, address } = this.props;
+    this.state = {
+      open: false,
+      selectedValue: '',
+    };
     this.API = new Chimalli(web3, address);
     this.getKeeper = this.getKeeper.bind(this);
   }
+
+  storePiece = () => {
+    this.setState({
+      open: true,
+    });
+  };
+
+  handleClose = value => {
+    console.log('Selected Value', value);
+    this.setState({ selectedValue: value, open: false });
+  };
 
   async getKeeper() {
     const { API } = this;
@@ -39,7 +55,7 @@ export default class ChimalliCard extends React.Component {
             <Button size="small" color="primary" onClick={() => this.getKeeper()}>
               Keeper
             </Button>
-            <Button size="small" color="primary">
+            <Button size="small" color="primary" onClick={() => this.storePiece()}>
               Store
             </Button>
             <Button size="small" color="primary">
@@ -47,6 +63,12 @@ export default class ChimalliCard extends React.Component {
             </Button>
           </CardActions>
         </Card>
+        <WrappedDialog
+          selectedValue={this.state.selectedValue}
+          open={this.state.open}
+          onClose={this.handleClose}
+          pieces={this.props.pieces || []}
+        />
       </Grid>
     )
   }
