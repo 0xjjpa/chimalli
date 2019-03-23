@@ -137,10 +137,10 @@ class App extends React.Component {
   splitSecret() {
     const { secret, amountOfPieces, threshold } = this.state;
     const hexSecret = secrets.str2hex(secret);
-    const pieces = secrets.share(hexSecret, amountOfPieces, threshold);
+    const pieces = secrets.share(hexSecret, ~~amountOfPieces, ~~threshold);
     this.setState({ pieces });
-    localStorage.setItem('threshold', threshold);
-    localStorage.setItem('amountOfPieces', amountOfPieces);
+    localStorage.setItem('threshold', ~~threshold);
+    localStorage.setItem('amountOfPieces', ~~amountOfPieces);
     localStorage.setItem('pieces', JSON.stringify(pieces));
   }
 
@@ -232,7 +232,7 @@ class App extends React.Component {
                       margin="normal"
                       type="number"
                       value={amountOfPieces}
-                      onChange={this.handleChange('pieces')}
+                      onChange={this.handleChange('amountOfPieces')}
                     />
                     to reconstruct the secret.
                   </Grid>
