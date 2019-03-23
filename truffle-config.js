@@ -3,7 +3,7 @@ require('dotenv').config()
 const path = require("path");
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const infura_apikey = process.env.INFURA_PROJECT_ID;
-const mnemonic = process.env.MNEMONIC;
+const mnemonic = process.env.MNEMONIC || 'own install ladder notice repair mother wing shine allow mimic lazy bike';
 
 const CONFIG = {
   networks: {
